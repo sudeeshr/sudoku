@@ -202,7 +202,7 @@ public class SudokuBoardDisplay extends JComponent {
                     for (int k = 1; k < 10; k++)
                         oneToNine.add(k);
                     candidates[i][j] = oneToNine;
-
+					
                     String str = "";
                     for(int list : oneToNine)
                     	str += list;
@@ -222,13 +222,20 @@ public class SudokuBoardDisplay extends JComponent {
         return Integer.parseInt(str);
     }
 
-    private void eliminateAll(){
-        for (int i = 0; i < 9; i++)
-            for (int j = 0; j < 9; j++)
-                if(_model.getVal(i, j) == 0){
-                    eliminateCandidates(i, j);
-        			insertNakedSingles(i, j);
-                }
+    private void eliminateAll() {
+    	try{
+	        for (int i = 0; i < 9; i++)
+	            for (int j = 0; j < 9; j++)
+	                if(_model.getVal(i, j) == 0){
+	                    eliminateCandidates(i, j);
+						Thread.sleep(10);
+	        			insertNakedSingles(i, j);
+	        			Thread.sleep(10);
+	                }
+        }
+        catch(InterruptedException ex){
+        	logToConsole("Interrupted");
+        }
     }
 
     private void eliminateAndInsert(int x, int y){
@@ -240,25 +247,28 @@ public class SudokuBoardDisplay extends JComponent {
     private void eliminateCandidates(int x, int y){ //works fine
         int rowOffset = (x/3)*3; int colOffset = (y/3)*3;
         for (int i = 0; i < 9; i++)//xy's row
-            if (candidates[x][y].contains(_model.getVal(x, i))){
-                print(x, y, arrayListToInt(candidates[x][y]));
-            	// if(candidates[x][y].size() > 1)
+            if (candidates[x][y].contains(_model.getVal(x, i)) && _model.getVal(x, i) != 0){
+            	if(candidates[x][y].size() > 1){
             		candidates[x][y].remove(candidates[x][y].indexOf(_model.getVal(x, i)));
+                	print(x, y, arrayListToInt(candidates[x][y]));
+            	}
             }
         //          remove numbers from candidate list if they appear in the row
         for (int i = 0; i < 9; i++)//xy's column
-            if (candidates[x][y].contains(_model.getVal(i, y))){
-                print(x, y, arrayListToInt(candidates[x][y]));
-            	// if(candidates[x][y].size() > 1)
+            if (candidates[x][y].contains(_model.getVal(i, y)) && _model.getVal(i, y) != 0){
+            	if(candidates[x][y].size() > 1){
             		candidates[x][y].remove(candidates[x][y].indexOf(_model.getVal(i, y)));
+                	print(x, y, arrayListToInt(candidates[x][y]));
+            	}
             }
         //          remove numbers from candidate list if they appear in the column
         for (int i = 0; i < 3; i++) //xy's box
             for (int j = 0; j < 3; j++)
-                if (candidates[x][y].contains(_model.getVal(rowOffset+i, colOffset+j))){
-                    print(x, y, arrayListToInt(candidates[x][y]));
-            		// if(candidates[x][y].size() > 1)
+                if (candidates[x][y].contains(_model.getVal(rowOffset+i, colOffset+j)) && _model.getVal(rowOffset+i, colOffset+j) != 0){
+            		if(candidates[x][y].size() > 1){
                 		candidates[x][y].remove(candidates[x][y].indexOf(_model.getVal(rowOffset+i, colOffset+j)));
+                    	print(x, y, arrayListToInt(candidates[x][y]));
+            		}
                 }
         //              remove numbers from candidate list if they appear in the box
     }

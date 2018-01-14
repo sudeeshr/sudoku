@@ -24,6 +24,8 @@ public class Sudoku extends JFrame {
     private SudokuModel        _sudokuLogic = new SudokuModel(INITIAL_BOARD);
     private SudokuBoardDisplay _sudokuBoard = new SudokuBoardDisplay(_sudokuLogic);
 
+    Thread queryThread;
+
 	public Sudoku() {
 		JButton btnLoad = new JButton("Load");
 		JButton btnRun = new JButton("Run");
@@ -42,6 +44,9 @@ public class Sudoku extends JFrame {
 
 		RunBtnListener runListener = new RunBtnListener();
 		btnRun.addActionListener(runListener);
+
+		InterruptBtnListener interruptListener = new InterruptBtnListener();
+		btnInterrupt.addActionListener(interruptListener);
 
 		JPanel controlPanel = new JPanel();
 		controlPanel.add(btnLoad);
@@ -101,12 +106,20 @@ public class Sudoku extends JFrame {
    	private class RunBtnListener implements ActionListener {
    		@Override
       	public void actionPerformed(ActionEvent e) {
-      		Thread queryThread = new Thread() {
+      		queryThread = new Thread() {
 	      		public void run() {
 	      			_sudokuBoard.solve();
 	      		}
 			};
       		queryThread.start();
+      	}
+   	}
+
+   	private class InterruptBtnListener implements ActionListener {
+   		@Override
+      	public void actionPerformed(ActionEvent e) {
+      		queryThread.interrupt();
+      		_sudokuBoard.logToConsole("Interrupted.");
       	}
    	}
 }
