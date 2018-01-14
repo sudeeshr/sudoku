@@ -163,35 +163,39 @@ public class SudokuBoardDisplay extends JComponent {
 
     private void Solver(){ //solves
         logToConsole("Working..");
+		try{
+	        fillCandidates();
+	        int counter = 0;
+	        boolean epicWin = false;
+	        while(!epicWin){
+	            int[][] lastMove = _model.deepCopyArray();
+	            for (int i = 0; i < 9; i++) {
+	                for (int j = 0; j < 9; j++) {
+	                    if(_model.getVal(i, j) == 0){
+	                        eliminateAndInsert(i, j);
+	                        _model.printBoard();
+	                        counter++;
+	                    }
 
-        fillCandidates();
-        int counter = 0;
-        boolean epicWin = false;
-        while(!epicWin){
-            int[][] lastMove = _model.deepCopyArray();
-            for (int i = 0; i < 9; i++) {
-                for (int j = 0; j < 9; j++) {
-                    if(_model.getVal(i, j) == 0){
-                        eliminateAndInsert(i, j);
-                        _model.printBoard();
-                        counter++;
-                    }
+	                    if(_model.solved()){
+	                        epicWin=true;
+	                        break;
+	                    }
+	                }
+	            }
+	            if(_model.deepEquals(lastMove)){
+	        		logToConsole("FAIL! Iterations: " + counter);
+	                System.out.println("FAIL! Iterations: " + counter);
+	                return;
+	            }
+	        }
 
-                    if(_model.solved()){
-                        epicWin=true;
-                        break;
-                    }
-                }
-            }
-            if(_model.deepEquals(lastMove)){
-        		logToConsole("FAIL! Iterations: " + counter);
-                System.out.println("FAIL! Iterations: " + counter);
-                return;
-            }
+	        logToConsole("WIN! Iterations: " + counter);
+        	System.out.println("WIN! Iterations: " + counter);
+		}
+        catch(Exception ex){
+        	logToConsole("Interrupted.");
         }
-
-		logToConsole("WIN! Iterations: " + counter);
-        System.out.println("WIN! Iterations: " + counter);
     }
 
     private void fillCandidates(){ //fills the candidate lists, 
@@ -224,7 +228,7 @@ public class SudokuBoardDisplay extends JComponent {
 
     private void eliminateAll() {
     	try{
-	        for (int i = 0; i < 9; i++)
+	        for (int i = 0; i < 9; i++){
 	            for (int j = 0; j < 9; j++)
 	                if(_model.getVal(i, j) == 0){
 	                    eliminateCandidates(i, j);
@@ -232,10 +236,11 @@ public class SudokuBoardDisplay extends JComponent {
 	        			insertNakedSingles(i, j);
 	        			Thread.sleep(10);
 	                }
-        }
-        catch(InterruptedException ex){
-        	logToConsole("Interrupted");
-        }
+	        }
+    	}
+    	catch(InterruptedException ex){
+    		logToConsole("Interrupted.");
+    	}
     }
 
     private void eliminateAndInsert(int x, int y){
@@ -295,7 +300,8 @@ public class SudokuBoardDisplay extends JComponent {
             for (int candidate = 1; candidate <= 9; candidate++)
                 if (multiplicityOf[candidate] == 1)
                     for (int col = 0; col < 9; col++)
-                        tryInsert(row, col, candidate);
+                    	if(_model.isValidMove(row, col, candidate))
+                        	tryInsert(row, col, candidate);
         }
          
         eliminateAll();
@@ -310,7 +316,8 @@ public class SudokuBoardDisplay extends JComponent {
             for (int candidate = 1; candidate <= 9; candidate++)
                 if (multiplicityOf[candidate] == 1)
                     for (int row = 0; row < 9; row++)
-                        tryInsert(row, col, candidate);
+                    	if(_model.isValidMove(row, col, candidate))
+        	                tryInsert(row, col, candidate);
         }
          
         eliminateAll();
@@ -330,7 +337,8 @@ public class SudokuBoardDisplay extends JComponent {
                     if (multiplicityOf[candidate] == 1)
                         for (int i = 0; i < 3; i++)
                             for (int j = 0; j < 3; j++)
-                                tryInsert(rowOffset+i, colOffset+j, candidate);
+                    			if(_model.isValidMove(rowOffset+i, colOffset+j, candidate))
+                                	tryInsert(rowOffset+i, colOffset+j, candidate);
             }
         }
     }
@@ -341,54 +349,10 @@ public class SudokuBoardDisplay extends JComponent {
             _model.setVal(row, col, candidate);
             print(row, col, candidate);
         }
-        else{
-        	// System.out.println(candidate + " " + _model.getVal(row, col));
-        	// System.out.println(candidates[row][col].toString());
-        }
     }
 
     public void solve() {
     	Solver();
-		/*String str = "";
-    	int nextVal = 0;
-    	int hashsetSize = 0;
-    	for(int row = 0; row < PUZZLE_SIZE; row++){
-    		for(int col = 0; col < PUZZLE_SIZE; col++){
-    			if(_model.getVal(row, col) != 0){
-    				continue;
-    			}
-				int z = 0;
-				HashSet<Integer> possibles = new HashSet<>();
-				for(int num = 1; num <= PUZZLE_SIZE; num++){
-	    			if(_model.isValidMove(row, col, num)){
-	    				possibles.add(num);
-	    				z++;
-	    				
-	    			}
-	    		}
-
-	    		str = "";
-	    		hashsetSize = possibles.size();
-	    		Iterator iter = possibles.iterator();
-				while (iter.hasNext()) {
-					nextVal = (int)iter.next();
-					str += nextVal + "";
-				    System.out.print(nextVal);
-				    if(hashsetSize == 1){
-		    			_model.setVal(row, col, nextVal);
-		    		}
-				}
-				System.out.println("--------");
-
-				tfCells[row][col].setText(str);
-	           	tfCells[row][col].setEditable(true);
-           		tfCells[row][col].setBackground(CLOSED_CELL_BGCOLOR);
-           		tfCells[row][col].setForeground(CLOSED_CELL_TEXT);
-
-	    		candidates[row][col] = possibles;
-	    	}
-	    }
-		*/
     }
 
     public void clear(){

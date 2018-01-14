@@ -119,7 +119,6 @@ public class Sudoku extends JFrame {
    		@Override
       	public void actionPerformed(ActionEvent e) {
       		queryThread.interrupt();
-      		_sudokuBoard.logToConsole("Interrupted.");
       	}
    	}
 }

@@ -150,8 +150,10 @@ public class SudokuModel {
 
     public boolean solved(){
         for (int i = 0; i < BOARD_SIZE; i++) {
-            if(Arrays.asList(this._board[i]).indexOf(0) > 0){
-                return false;
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if(this._board[i][j] == 0){
+                    return false;
+                }
             }
         }
 
